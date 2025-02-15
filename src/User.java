@@ -6,9 +6,9 @@ class User {
     // Champ statique pour garder le compteur
     private static int instanceCounter;
 
-    private final long id; // Identifiant unique généré automatiquement
-    private String firstName;
-    private String lastName;// Prénom de l'utilisateur
+    protected final long id; // Identifiant unique généré automatiquement
+    protected String firstName;
+    protected String lastName;// Prénom de l'utilisateur
 
     // Bloc statique : initialise le compteur à 0
     static {

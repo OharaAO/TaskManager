@@ -18,11 +18,11 @@ class Task {
     }
 
 
-    private final String id; // Identifiant unique généré automatiquement
-    private String title; // Titre de la tâche
-    private String description; // Description de la tâche
-    private boolean done; // Indicateur de complétion
-    private final User creator; // Référence à l'utilisateur créateur
+    protected final String id; // Identifiant unique généré automatiquement
+    protected String title; // Titre de la tâche
+    protected String description; // Description de la tâche
+    protected boolean done; // Indicateur de complétion
+    protected final User creator; // Référence à l'utilisateur créateur
 
     public Task(String title, String description, User creator) {
 
@@ -39,7 +39,7 @@ class Task {
                 ", title='" + title + '\'' + '\n' +
                 ", description='" + description + '\'' + '\n' +
                 ", done=" + done + '\n' +
-                ", creator=" + creator.getId() + '\'' + '\n' +
+                ", creator id=" + creator.getId() + '\'' + '\n' +
                 ", creator=" + creator.getFirstName() + '\n' +
                 '}';
     }

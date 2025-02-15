@@ -7,7 +7,7 @@ import java.util.List;
 class TaskManager {
     private static TaskManager instance; // Instance unique de la classe
     private List<Task> tasks = new ArrayList<>(); // Liste des tâches
-    private List<User> users = new ArrayList<>(); // Liste des utilisateurs
+    private static List<User> users = new ArrayList<>(); // Liste des utilisateurs
     // Constructeur privé pour empêcher l'instanciation directe
     private TaskManager() {}
 
@@ -25,6 +25,12 @@ class TaskManager {
 
     // Ajoute une tâche à la liste
     public void addTask(Task task) {
+        if (users.stream().noneMatch(user -> user.getFirstName().equals(task.getCreator().getFirstName())))
+            users.add(task.getCreator());
+        tasks.add(task);
+    }
+
+    public void addDatedTask(Task task) {
         if (users.stream().noneMatch(user -> user.getFirstName().equals(task.getCreator().getFirstName())))
             users.add(task.getCreator());
         tasks.add(task);
