@@ -1,1 +1,7 @@
-CREATE a database using h2Database dependencies
+create a class to manage task in the H2 database : modify Task manager 
+
+add a main program in the main class
+
+create an graphic interface using SWING 
+
+
