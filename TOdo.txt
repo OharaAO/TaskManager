@@ -1,7 +1,9 @@
-create a class to manage task in the H2 database : modify Task manager 
+finish to define other method to create/ Delete DatedTask
 
-add a main program in the main class
+Finish to add methods in the main program
 
-create an graphic interface using SWING 
+Finish the grphic interface using Swing :
+    - link buttons to methos using "AdventListener"
+    - create new pennel/ frames for each method called by pressing a button.
 
 
