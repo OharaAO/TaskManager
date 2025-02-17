@@ -1,5 +1,3 @@
-import java.util.UUID;
-
 class Task {
     //champ statique pour garder le compteur
     private static int instanceCounter;
@@ -22,9 +20,9 @@ class Task {
     protected String title; // Titre de la tâche
     protected String description; // Description de la tâche
     protected boolean done; // Indicateur de complétion
-    protected final User creator; // Référence à l'utilisateur créateur
+    protected final String creator; // Référence à l'utilisateur créateur
 
-    public Task(String title, String description, User creator) {
+    public Task(String title, String description, String creator, Boolean done) {
 
         this.title = title;
         this.description = description;
@@ -39,8 +37,8 @@ class Task {
                 ", title='" + title + '\'' + '\n' +
                 ", description='" + description + '\'' + '\n' +
                 ", done=" + done + '\n' +
-                ", creator id=" + creator.getId() + '\'' + '\n' +
-                ", creator=" + creator.getFirstName() + '\n' +
+               // ", creator id=" + creator.getId() + '\'' + '\n' +
+               // ", creator=" + creator.getFirstName() + '\n' +
                 '}';
     }
 
@@ -72,8 +70,12 @@ class Task {
         this.done = done;
     }
 
-    public User getCreator() {
-        return creator;
+    //public User getCreator() {
+   //     return creator;
+    //}
+
+    public void setCreator(User creator) {
+
     }
 }
 

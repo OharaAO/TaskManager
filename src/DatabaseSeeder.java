@@ -3,6 +3,7 @@ import me.xdrop.jrand.JRand;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 
 public class DatabaseSeeder {
@@ -37,8 +38,8 @@ public class DatabaseSeeder {
         return users;
     }
 
-    public static void main(String[] args) {
-        DatabaseSeeder seeder = new DatabaseSeeder();
-        seeder.seed();
-    }
+
+
+
+
 }

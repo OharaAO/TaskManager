@@ -1,13 +1,15 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Scanner;
 
 class TaskManager {
     private static TaskManager instance; // Instance unique de la classe
     private List<Task> tasks = new ArrayList<>(); // Liste des tâches
-    private static List<User> users = new ArrayList<>(); // Liste des utilisateurs
+    private List<User> users = new ArrayList<>(); // Liste des utilisateurs
+
     // Constructeur privé pour empêcher l'instanciation directe
     private TaskManager() {}
 
@@ -24,12 +26,219 @@ class TaskManager {
     }
 
     // Ajoute une tâche à la liste
-    public void addTask(Task task) {
-        if (users.stream().noneMatch(user -> user.getFirstName().equals(task.getCreator().getFirstName())))
-            users.add(task.getCreator());
-        tasks.add(task);
+    public List<Task> addTask() throws SQLException {
+        final H2Embeddedmode h2Embeddedmode = H2Embeddedmode.getInstance();
+
+        Connection connection = null;
+        PreparedStatement stmt = null;
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            connection = h2Embeddedmode.getConnection(); // Assuming h2Embeddedmode is a class that provides the connection
+
+            System.out.println("Please enter the title: ");
+            String title = scanner.nextLine();
+            System.out.println("Please enter the description: ");
+            String description = scanner.nextLine();
+            System.out.println("Please enter creator name: ");
+            String firstName = scanner.nextLine();
+            System.out.println("Please enter the done status (true/false): ");
+            boolean status = scanner.nextBoolean();
+            scanner.nextLine(); // Consume the newline character
+
+            Task task = new Task(title, description, firstName, status);
+            tasks.add(task);
+
+            String sql = "INSERT INTO TASKS (TITLE, DESCRIPTION, CREATOR, DONE) VALUES (?, ?, ?, ?)";
+            stmt = connection.prepareStatement(sql);
+            stmt.setString(1, title);
+            stmt.setString(2, description);
+            stmt.setObject(3, firstName);
+            stmt.setBoolean(4, status);
+
+            stmt.executeUpdate();
+
+        } finally {
+            // Close resources in finally block to ensure they are closed even if an exception occurs
+            if (stmt != null) {
+                stmt.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+            scanner.close();
+        }
+
+        return tasks;
     }
 
+    // Supprimer une tache
+    public List<Task> deleteTask() throws SQLException {
+        final H2Embeddedmode h2Embeddedmode = H2Embeddedmode.getInstance();
+        Connection connection = null;
+        PreparedStatement stmt = null;
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            connection = h2Embeddedmode.getConnection();
+            System.out.println("Please enter the title: ");
+            String title = scanner.nextLine();
+            String sql = "DELETE FROM TASKS WHERE TITLE = ?";
+            stmt = connection.prepareStatement(sql);
+            stmt.setString(1, title);
+            stmt.executeUpdate();
+
+        } finally {
+            // Close resources in finally block to ensure they are closed even if an exception occurs
+            if (stmt != null) {
+                stmt.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+            scanner.close();
+        }
+
+        return tasks;
+    }
+
+
+
+    // Ajouter un Utilisateur
+    public List<User> addUser() throws SQLException {
+        final H2Embeddedmode h2Embeddedmode = H2Embeddedmode.getInstance();
+
+        Connection connection = null;
+        PreparedStatement stmt = null;
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            connection = h2Embeddedmode.getConnection(); // Assuming h2Embeddedmode is a class that provides the connection
+
+            System.out.println("Please enter the first name: ");
+            String firstName = scanner.nextLine();
+
+            User user = new User(firstName);
+            users.add(user);
+            String sql = "INSERT INTO USERS (USERNAME) VALUES (?)";
+            stmt = connection.prepareStatement(sql);
+            stmt.setString(1, firstName);
+            stmt.executeUpdate();
+
+        } finally {
+            // Close resources in finally block to ensure they are closed even if an exception occurs
+            if (stmt != null) {
+                stmt.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+            scanner.close();
+        }
+
+        return users;
+    }
+
+    //Supprimer un utilisateur
+    public List<User> deleteUser() throws SQLException {
+        final H2Embeddedmode h2Embeddedmode = H2Embeddedmode.getInstance();
+
+        Connection connection = null;
+        PreparedStatement stmt = null;
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            connection = h2Embeddedmode.getConnection();
+            System.out.println("Please enter the first name: ");
+            String firstName = scanner.nextLine();
+            String sql = "DELETE FROM USERS WHERE USERNAME = ?";
+            stmt = connection.prepareStatement(sql);
+            stmt.setString(1, firstName);
+            stmt.executeUpdate();
+
+        } finally {
+            // Close resources in finally block to ensure they are closed even if an exception occurs
+            if (stmt != null) {
+                stmt.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+            scanner.close();
+        }
+
+        return users;
+
+
+    }
+
+    //Mettre à jour une tache
+    List<Task> updateTask() throws SQLException {
+        final H2Embeddedmode h2Embeddedmode = H2Embeddedmode.getInstance();
+
+        Connection connection = null;
+        PreparedStatement stmt = null;
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            connection = h2Embeddedmode.getConnection();
+            System.out.println("Please enter the title of task to update: ");
+            String oldTitle = scanner.nextLine();
+            System.out.println("Enter de new title of task to update: ");
+            String title = scanner.nextLine();
+            System.out.println("Please enter the description of task to update: ");
+            String description = scanner.nextLine();
+            System.out.println("Please enter the done status of task to update: ");
+            boolean status = scanner.nextBoolean();
+            scanner.nextLine();
+            Task task = new Task(title, description, "", status);
+            tasks.add(task);
+
+            String sql = "UPDATE TASKS SET TITLE = ?, DESCRIPTION = ?, DONE = ? WHERE TITLE = ?";
+            stmt = connection.prepareStatement(sql);
+            stmt.setString(1, title);
+            stmt.setString(2, description);
+            stmt.setBoolean(3, status);
+            stmt.setString(4, oldTitle);
+            stmt.executeUpdate();
+
+        } finally {
+            // Close resources in finally block to ensure they are closed even if an exception occurs
+            if (stmt != null) {
+                stmt.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+            scanner.close();
+        }
+
+        return tasks;
+    }
+
+
+
+
+    }
+
+
+
+
+
+
+// Placeholder for Task class
+
+
+
+
+
+
+
+
+
+
+
+/*
     public void addDatedTask(Task task) {
         if (users.stream().noneMatch(user -> user.getFirstName().equals(task.getCreator().getFirstName())))
             users.add(task.getCreator());

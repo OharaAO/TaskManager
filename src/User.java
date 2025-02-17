@@ -24,6 +24,8 @@ class User {
         this.id =  instanceCounter++;
         this.firstName = firstName;
     }
+
+
     @Override
     public String toString() {
         return "User{" +
