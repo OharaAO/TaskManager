@@ -64,14 +64,14 @@ public class Main {
          */
 
         // Mettre a jour une Datedtask
-
+        /*
         try {
             List<Task> tasks = taskManager.updateDatedTask();
             System.out.println("tasks updated ");
         }catch (Exception e) {
             e.printStackTrace();
         }
-
+        */
         // Supprimer une tache
         /*
         try {
