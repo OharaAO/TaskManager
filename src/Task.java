@@ -30,6 +30,10 @@ class Task {
         this.creator = creator;
     }
 
+
+
+
+
     @Override
     public String toString() {
         return "Task{" +
@@ -38,7 +42,7 @@ class Task {
                 ", description='" + description + '\'' + '\n' +
                 ", done=" + done + '\n' +
                // ", creator id=" + creator.getId() + '\'' + '\n' +
-               // ", creator=" + creator.getFirstName() + '\n' +
+              //  ", creator=" + creator.getFirstName() + '\n' +
                 '}';
     }
 
@@ -70,9 +74,9 @@ class Task {
         this.done = done;
     }
 
-    //public User getCreator() {
-   //     return creator;
-    //}
+    public String getCreator() {
+       return creator;
+    }
 
     public void setCreator(User creator) {
 

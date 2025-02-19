@@ -25,21 +25,23 @@ public class Main {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                MainWindow mainWindow = new MainWindow();
+                MainWindow mainWindow = MainWindow.getInstance();
+                mainWindow.mainButton();
                 mainWindow.show();
 
             }
         });
 
+
+        // Ajouter une DatedTask
         /*
-        // Ajouter une tache
         try {
-            List<Task> tasks = taskManager.addTask();
+            List<Task> tasks = taskManager.addDatedTask();
             System.out.println("Task added successfully: " + tasks);
         } catch (SQLException e) {
             e.printStackTrace();
-        } */
-
+        }
+        */
 
         /*
         // Ajouter un utilisateur
@@ -51,8 +53,27 @@ public class Main {
         } */
 
         /*
-        // Supprimer une tache
+        //Supprimer une DatedTask
+        try {
+            List<Task> tasks = taskManager.deleteDatedTask();
+            System.out.println("Task deleted ");
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
 
+         */
+
+        // Mettre a jour une Datedtask
+
+        try {
+            List<Task> tasks = taskManager.updateDatedTask();
+            System.out.println("tasks updated ");
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Supprimer une tache
+        /*
         try {
             List<Task> tasks = taskManager.deleteTask();
             System.out.println("Task deleted ");

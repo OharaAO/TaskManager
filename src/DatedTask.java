@@ -1,10 +1,10 @@
-/*import java.time.LocalDate;
+import java.time.LocalDate;
 
 class DatedTask extends Task {
     LocalDate dueDate; // Date d'échéance de la tâche
 
-    public DatedTask(String title, String description, User creator, LocalDate dueDate) {
-        super(title, description, creator);
+    public DatedTask(String title, String description, String creator,Boolean done, LocalDate dueDate) {
+        super(title, description, creator,done);
         this.dueDate = dueDate;
         
     }
@@ -27,8 +27,8 @@ class DatedTask extends Task {
                 ", description='" + description + '\'' + '\n' +
                 ", done=" + done + '\n' +
                 ", DueDate ='" + dueDate + '\n' +
-                ", creator id=" + creator.getId() + '\'' + '\n' +
-                ", creator=" + creator.getFirstName() + '\n' +
+               // ", creator id=" + creator.getId() + '\'' + '\n' +
+               // ", creator=" + creator.getFirstName() + '\n' +
                 '}';
 
 
@@ -38,4 +38,4 @@ class DatedTask extends Task {
     }
 }
 
- */
+
