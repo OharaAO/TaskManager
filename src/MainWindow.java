@@ -2,20 +2,23 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 class MainWindow {
     private static volatile MainWindow Instance;
     private JFrame window;
-    private CardLayout cardLayout; // Layout manager to switch between panels
-    private JPanel mainPanel; // Panel for the main view
-    private JPanel addTaskPanel; // Panel for the "Add Task" view
+    private CardLayout cardLayout;
+    private JPanel mainPanel;
+    private JPanel addTaskPanel;
+    private JPanel updateTaskPanel;
     private JPanel containerPanel;
+    private JPanel addUserPanel;
+    private JPanel deleteTaskPanel;
 
-    // Singleton instance getter
     public static MainWindow getInstance() {
         if (Instance == null) {
             synchronized (MainWindow.class) {
-                if (Instance == null) { // Double-check locking
+                if (Instance == null) {
                     Instance = new MainWindow();
                 }
             }
@@ -23,143 +26,310 @@ class MainWindow {
         return Instance;
     }
 
-    // Private constructor for singleton
+    TaskManager taskManager = TaskManager.getInstance();
+
     private MainWindow() {
+        initializeWindow();
+        initializePanels();
+    }
+
+    private void initializeWindow() {
         window = new JFrame();
         window.setTitle("Task Manager");
         window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         window.setSize(800, 600);
         window.setLocationRelativeTo(null);
 
-        // Initialize CardLayout and main container panel
         cardLayout = new CardLayout();
-        containerPanel = new JPanel(cardLayout); // Initialize the container panel
+        containerPanel = new JPanel(cardLayout);
         window.add(containerPanel, BorderLayout.CENTER);
+    }
 
-        // Create the main panel
-        mainPanel = new JPanel();
-        mainPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 5));
-        mainPanel.setBackground(Color.LIGHT_GRAY);
+    private void initializePanels() {
+        mainPanel = createMainPanel();
+        addTaskPanel = createAddTaskPanel();
+        updateTaskPanel = createUpdateTaskPanel();
+        addUserPanel = createAddUserPanel();
+        deleteTaskPanel = createDeleteTaskPanel();
+
         containerPanel.add(mainPanel, "MainView");
-
-        // Create the "Add Task" panel
-        addTaskPanel = new JPanel();
-        addTaskPanel.setLayout(new GridLayout(5, 2, 10, 10));
-        addTaskPanel.setBackground(Color.WHITE);
         containerPanel.add(addTaskPanel, "AddTaskView");
+        containerPanel.add(updateTaskPanel, "UpdateTaskView");
+        containerPanel.add(addUserPanel, "AddUserView");
+        containerPanel.add(deleteTaskPanel, "DeleteTaskView");
 
-        // Show the main panel by default
         cardLayout.show(containerPanel, "MainView");
     }
 
-    // Method to create and add buttons to the main panel
-    public void mainButton() {
-        JButton addTaskButton = new JButton("Ajouter une tache");
-        addTaskButton.setBackground(Color.WHITE);
-        addTaskButton.setToolTipText("Ajouter une tache");
-        addTaskButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showAddTaskView(); // Switch to the "Add Task" view
-            }
-        });
-        mainPanel.add(addTaskButton);
-
-        JButton button1 = new JButton("Supprimer une tache");
-        button1.setBackground(Color.WHITE);
-        button1.setToolTipText("Supprimer une tache");
-        mainPanel.add(button1);
-
-        JButton button3 = new JButton("Modifier une tache");
-        button3.setBackground(Color.WHITE);
-        button3.setToolTipText("Modifier une tache");
-        mainPanel.add(button3);
-
-        JButton button4 = new JButton("Ajouter un utilisateur");
-        button4.setBackground(Color.WHITE);
-        button4.setToolTipText("Ajouter un utilisateur");
-        mainPanel.add(button4);
-
-        JButton button5 = new JButton("Supprimer un utilisateur");
-        button5.setBackground(Color.WHITE);
-        button5.setToolTipText("Supprimer un utilisateur");
-        mainPanel.add(button5);
+    private JPanel createMainPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        panel.setBackground(Color.LIGHT_GRAY);
+        addMainButtons(panel);
+        return panel;
     }
 
-    // Method to show the window
+    private void addMainButtons(JPanel panel) {
+        JButton addTaskButton = createButton("Ajouter une tache", e -> showAddTaskView());
+        panel.add(addTaskButton);
+
+        panel.add(createButton("Supprimer une tache", e -> showDeleteTaskView()));
+
+        panel.add(createButton("Modifier une tache", e -> showUpdateTaskView()));
+
+
+        panel.add(createButton("Ajouter un utilisateur", e -> showAddUserView()));
+        panel.add(createButton("Supprimer un utilisateur", e -> {}));
+    }
+
+    private JButton createButton(String text, ActionListener listener) {
+        JButton button = new JButton(text);
+        button.setBackground(Color.WHITE);
+        button.addActionListener(listener);
+        return button;
+    }
+
+    private JPanel createAddTaskPanel() {
+        JPanel panel = new JPanel(new GridLayout(7, 2, 7, 7));
+        panel.setBackground(Color.WHITE);
+        return panel;
+    }
+
+    private JPanel createDeleteTaskPanel() {
+        JPanel panel = new JPanel(new GridLayout(4, 2, 3, 3));
+        panel.setBackground(Color.WHITE);
+        return panel;
+    }
+
+    private JPanel createUpdateTaskPanel() {
+        JPanel panel = new JPanel(new GridLayout(7, 2, 3, 3));
+        panel.setBackground(Color.WHITE);
+        return panel;
+    }
+    private JPanel createAddUserPanel() {
+        JPanel panel = new JPanel(new GridLayout(4, 2, 3, 3));
+        panel.setBackground(Color.WHITE);
+        return panel;
+    }
+
     public void show() {
         window.setVisible(true);
     }
 
-    // Method to show the "Add Task" view
     public void showAddTaskView() {
-        // Clear the "Add Task" panel before adding components
         addTaskPanel.removeAll();
+        createTaskForm();
+        cardLayout.show(containerPanel, "AddTaskView");
+    }
 
-        // Add components to the "Add Task" panel
-        JLabel titleLabel = new JLabel("Create a New Task");
-        titleLabel.setFont(new Font("Sans-serif", Font.BOLD, 18));
-        addTaskPanel.add(titleLabel);
-        addTaskPanel.add(new JLabel()); // Empty cell for layout
+    public void showDeleteTaskView() {
+        deleteTaskPanel.removeAll();
+        createDeleteTaskForm();
+        cardLayout.show(containerPanel, "DeleteTaskView");
 
-        JLabel taskTitleLabel = new JLabel("Task Title:");
+    }
+
+    public void showUpdateTaskView() {
+        updateTaskPanel.removeAll();
+        updateTaskForm();
+        cardLayout.show(containerPanel, "UpdateTaskView");
+    }
+
+    public void showAddUserView() {
+        addUserPanel.removeAll();
+        createAddUserForm();
+        cardLayout.show(containerPanel, "AddUserView");
+    }
+
+    public void createAddUserForm() {
+        JTextField usernameField = new JTextField(20);
+        addUserPanel.add(new JLabel("Create New User"));
+        addUserPanel.add(new JLabel());
+
+
+        addUserPanel.add(new JLabel("Enter User First Name : "));
+        addUserPanel.add(usernameField);
+
+        JButton saveButton = createButton("Save", e -> {
+            try {
+                saveUser(usernameField);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        JButton cancelButton = createButton("Cancel", e -> showMainView());
+
+        addUserPanel.add(saveButton);
+        addUserPanel.add(cancelButton);
+
+        addUserPanel.revalidate();
+        addUserPanel.repaint();
+    }
+
+    private void createDeleteTaskForm() {
         JTextField taskTitleField = new JTextField(20);
-        addTaskPanel.add(taskTitleLabel);
+
+        deleteTaskPanel.add(new JLabel("Delete Task"));
+        deleteTaskPanel.add(new JLabel());
+        deleteTaskPanel.add(new JLabel("Enter Task Title : "));
+        deleteTaskPanel.add(taskTitleField);
+        JButton saveButton = createButton("Save", e -> {
+            try {
+                saveDeletedTask(taskTitleField);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+
+
+        });
+        JButton cancelButton = createButton("Cancel", e -> showMainView());
+        deleteTaskPanel.add(saveButton);
+        deleteTaskPanel.add(cancelButton);
+        deleteTaskPanel.revalidate();
+        deleteTaskPanel.repaint();
+
+    }
+
+    private void createTaskForm() {
+        JTextField taskTitleField = new JTextField(20);
+        JTextField taskDescField = new JTextField(20);
+        JTextField taskStatusField = new JTextField(20);
+
+        JTextField firstNameField = new JTextField(20);
+
+        addTaskPanel.add(new JLabel("Create a New Task"));
+        addTaskPanel.add(new JLabel());
+
+        addTaskPanel.add(new JLabel("Task Title:"));
         addTaskPanel.add(taskTitleField);
 
-        JLabel taskDescLabel = new JLabel("Task Description:");
-        JTextField taskDescField = new JTextField(20);
-        addTaskPanel.add(taskDescLabel);
+        addTaskPanel.add(new JLabel("Task Description:"));
         addTaskPanel.add(taskDescField);
 
-        JLabel dueDateLabel = new JLabel("Due Date (YYYY-MM-DD):");
-        JTextField dueDateField = new JTextField(20);
-        addTaskPanel.add(dueDateLabel);
-        addTaskPanel.add(dueDateField);
+        addTaskPanel.add(new JLabel("Task Status Done (True/False):"));
+        addTaskPanel.add(taskStatusField);
 
-        JButton saveButton = new JButton("Save");
-        JButton cancelButton = new JButton("Cancel");
 
-        saveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Get user input
-                String title = taskTitleField.getText();
-                String description = taskDescField.getText();
-                String dueDate = dueDateField.getText();
+        addTaskPanel.add(new JLabel("First Name:"));
+        addTaskPanel.add(firstNameField);
 
-                // Validate input
-                if (title.isEmpty() || description.isEmpty() || dueDate.isEmpty()) {
-                    JOptionPane.showMessageDialog(window, "All fields are required!", "Error", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    // Save the task (you can add your logic here)
-                    JOptionPane.showMessageDialog(window, "Task saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    showMainView(); // Switch back to the main view
-                }
+        JButton saveButton = createButton("Save", e -> {
+            try {
+                saveTask(taskTitleField, taskDescField, taskStatusField, firstNameField);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
             }
         });
-
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showMainView(); // Switch back to the main view
-            }
-        });
+        JButton cancelButton = createButton("Cancel", e -> showMainView());
 
         addTaskPanel.add(saveButton);
         addTaskPanel.add(cancelButton);
 
-        // Refresh the panel
         addTaskPanel.revalidate();
         addTaskPanel.repaint();
-
-        // Switch to the "Add Task" view
-        cardLayout.show(containerPanel, "AddTaskView");
     }
 
-    // Method to show the main view
+    private void updateTaskForm() {
+        JTextField oldTaskTitleField = new JTextField(20);
+        JTextField taskTitleField = new JTextField(20);
+        JTextField taskDescField = new JTextField(20);
+        JTextField taskStatusField = new JTextField(20);
+
+        updateTaskPanel.add(new JLabel("Update a Task"));
+        updateTaskPanel.add(new JLabel());
+
+        updateTaskPanel.add(new JLabel("Enter Old Task Title:"));
+        updateTaskPanel.add(oldTaskTitleField);
+
+        updateTaskPanel.add(new JLabel("Enter new Task Title:"));
+        updateTaskPanel.add(taskTitleField);
+
+        updateTaskPanel.add(new JLabel("Enter new Task Description:"));
+        updateTaskPanel.add(taskDescField);
+
+        updateTaskPanel.add(new JLabel("Task Status Done (True/False):"));
+        updateTaskPanel.add(taskStatusField);
+
+        JButton saveButton = createButton("Save", e -> {
+            try {
+                saveUpdatedTask(oldTaskTitleField, taskTitleField, taskDescField, taskStatusField);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        JButton cancelButton = createButton("Cancel", e -> showMainView());
+
+        updateTaskPanel.add(saveButton);
+        updateTaskPanel.add(cancelButton);
+
+        updateTaskPanel.revalidate();
+        updateTaskPanel.repaint();
+
+    }
+
+    private void saveUser(JTextField usernameField) throws SQLException {
+        String firstname = usernameField.getText();
+
+        if (firstname.isEmpty()) {
+            JOptionPane.showMessageDialog(window, "fritname field is required", "Error", JOptionPane.ERROR_MESSAGE);
+        }else {
+            taskManager.addUser(firstname);
+            JOptionPane.showMessageDialog(window, "User has been added successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+            showMainView();
+
+
+        }
+    }
+
+
+    private void saveTask(JTextField titleField, JTextField descField, JTextField statusField,  JTextField firstNameField) throws SQLException {
+        String title = titleField.getText();
+        String description = descField.getText();
+        String status = statusField.getText();
+
+        String firstName = firstNameField.getText();
+
+
+
+        if (title.isEmpty() || description.isEmpty()) {
+            JOptionPane.showMessageDialog(window, "All fields are required!", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            taskManager.addTask(title, description, status, firstName);
+            JOptionPane.showMessageDialog(window, "Task saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            showMainView();
+        }
+    }
+
+    private void saveUpdatedTask(JTextField oldTaskTitleField,JTextField taskTitleField, JTextField taskDescField,JTextField taskStatusField ) throws SQLException {
+        String oldTaskTitle = oldTaskTitleField.getText();
+        String title = taskTitleField.getText();
+        String taskDesc = taskDescField.getText();
+        String taskStatus = taskStatusField.getText();
+        if (oldTaskTitle.isEmpty() || title.isEmpty() || taskDesc.isEmpty() || taskStatus.isEmpty()) {
+            JOptionPane.showMessageDialog(window, "All fields are required!", "Error", JOptionPane.ERROR_MESSAGE);
+
+        }else {
+            taskManager.updateTask(oldTaskTitle, title, taskDesc, taskStatus);
+            JOptionPane.showMessageDialog(window, "Task saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            showMainView();
+        }
+    }
+
+    private void saveDeletedTask(JTextField titleField) throws SQLException {
+        String title = titleField.getText();
+        if (title.isEmpty()) {
+            JOptionPane.showMessageDialog(window, "All fields are required!", "Error", JOptionPane.ERROR_MESSAGE);
+
+        }else {
+            taskManager.deleteTask(title);
+            JOptionPane.showMessageDialog(window, "Task deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            showMainView();
+        }
+    }
+
     public void showMainView() {
-        // Switch back to the main view
         cardLayout.show(containerPanel, "MainView");
+    }
+
+    public void mainButton() {
     }
 }

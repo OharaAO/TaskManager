@@ -36,15 +36,15 @@ class TaskManager {
         try {
             connection = h2Embeddedmode.getConnection(); // Assuming h2Embeddedmode is a class that provides the connection
 
-            System.out.println("Please enter the title: ");
-            String title = scanner.nextLine();
-            System.out.println("Please enter the description: ");
-            String description = scanner.nextLine();
-            System.out.println("Please enter creator name: ");
-            String firstName = scanner.nextLine();
-            System.out.println("Please enter the done status (true/false): ");
-            boolean status = scanner.nextBoolean();
-            scanner.nextLine(); // Consume the newline character
+
+            String title = null;
+
+            String description = null;
+
+            String firstName = null;
+
+            boolean status = false;
+
 
             Task task = new Task(title, description, firstName, status);
             tasks.add(task);
@@ -72,92 +72,19 @@ class TaskManager {
         return tasks;
     }
 
-    // Add Dated Task
-    public List<Task> addDatedTask() throws SQLException  {
-        final H2Embeddedmode h2Embeddedmode = H2Embeddedmode.getInstance();
-        Connection connection = null;
-        PreparedStatement stmt = null;
-        Scanner scanner = new Scanner(System.in);
 
-        try {
-            connection = h2Embeddedmode.getConnection();
 
-            System.out.println("Please enter the title: ");
-            String title = scanner.nextLine();
-            System.out.println("Please enter the description: ");
-            String description = scanner.nextLine();
-            System.out.println("Please enter the done status (true/false): ");
-            boolean status = scanner.nextBoolean();
-            scanner.nextLine();
-            System.out.println("Please enter the done date(YYYY-MM-DD): ");
-            String date = scanner.nextLine();
-            System.out.println("Please enter creator name: ");
-            String firstName = scanner.nextLine();
-            Task task = new Task(title, description, firstName, status);
 
-            String sql = "INSERT INTO DATEDTASKS (TITLE, DESCRIPTION, DONE, DUEDATE, CREATOR) VALUES (?, ?, ?, ?,?)";
-            stmt = connection.prepareStatement(sql);
-            stmt.setString(1,title);
-            stmt.setString(2, description);
-            stmt.setObject(3, status);
-            stmt.setString(4, date);
-            stmt.setObject(5, firstName);
-
-            stmt.executeUpdate();
-        }finally {
-            // Close resources in finally block to ensure they are closed even if an exception occurs
-            if (stmt != null) {
-                stmt.close();
-            }
-            if (connection != null) {
-                connection.close();
-            }
-            scanner.close();
-        }
-        return tasks;
-    }
-
-    //supprimer une DatedTask
-    public List<Task> deleteDatedTask() throws SQLException {
-        final H2Embeddedmode h2Embeddedmode = H2Embeddedmode.getInstance();
-        Connection connection = null;
-        PreparedStatement stmt = null;
-        Scanner scanner = new Scanner(System.in);
-
-        try {
-            connection = h2Embeddedmode.getConnection();
-            System.out.println("Please enter the title: ");
-            String title = scanner.nextLine();
-            String sql = "DELETE FROM DATEDTASKS WHERE TITLE = ?";
-            stmt = connection.prepareStatement(sql);
-            stmt.setString(1, title);
-            stmt.executeUpdate();
-
-        } finally {
-            // Close resources in finally block to ensure they are closed even if an exception occurs
-            if (stmt != null) {
-                stmt.close();
-            }
-            if (connection != null) {
-                connection.close();
-            }
-            scanner.close();
-        }
-
-        return tasks;
-    }
 
     // Supprimer une tache
-    public List<Task> deleteTask() throws SQLException {
+    public void deleteTask(String title) throws SQLException {
         final H2Embeddedmode h2Embeddedmode = H2Embeddedmode.getInstance();
         Connection connection = null;
         PreparedStatement stmt = null;
-        Scanner scanner = new Scanner(System.in);
 
         try {
             connection = h2Embeddedmode.getConnection();
-            System.out.println("Please enter the title: ");
-            String title = scanner.nextLine();
+
             String sql = "DELETE FROM TASKS WHERE TITLE = ?";
             stmt = connection.prepareStatement(sql);
             stmt.setString(1, title);
@@ -171,33 +98,29 @@ class TaskManager {
             if (connection != null) {
                 connection.close();
             }
-            scanner.close();
+
         }
 
-        return tasks;
     }
 
 
 
     // Ajouter un Utilisateur
-    public List<User> addUser() throws SQLException {
+    public void  addUser(String firstname) throws SQLException {
         final H2Embeddedmode h2Embeddedmode = H2Embeddedmode.getInstance();
 
         Connection connection = null;
         PreparedStatement stmt = null;
-        Scanner scanner = new Scanner(System.in);
+
 
         try {
             connection = h2Embeddedmode.getConnection(); // Assuming h2Embeddedmode is a class that provides the connection
 
-            System.out.println("Please enter the first name: ");
-            String firstName = scanner.nextLine();
 
-            User user = new User(firstName);
-            users.add(user);
+
             String sql = "INSERT INTO USERS (USERNAME) VALUES (?)";
             stmt = connection.prepareStatement(sql);
-            stmt.setString(1, firstName);
+            stmt.setString(1, firstname);
             stmt.executeUpdate();
 
         } finally {
@@ -208,10 +131,10 @@ class TaskManager {
             if (connection != null) {
                 connection.close();
             }
-            scanner.close();
+
         }
 
-        return users;
+
     }
 
     //Supprimer un utilisateur
@@ -248,33 +171,22 @@ class TaskManager {
     }
 
     //Mettre à jour une tache
-    List<Task> updateTask() throws SQLException {
+    public void updateTask(String oldTaskTitle,String title, String taskDesc, String TaskStatus ) throws SQLException {
         final H2Embeddedmode h2Embeddedmode = H2Embeddedmode.getInstance();
 
         Connection connection = null;
         PreparedStatement stmt = null;
-        Scanner scanner = new Scanner(System.in);
 
         try {
             connection = h2Embeddedmode.getConnection();
-            System.out.println("Please enter the title of task to update: ");
-            String oldTitle = scanner.nextLine();
-            System.out.println("Enter de new title of task to update: ");
-            String title = scanner.nextLine();
-            System.out.println("Please enter the description of task to update: ");
-            String description = scanner.nextLine();
-            System.out.println("Please enter the done status of task to update: ");
-            boolean status = scanner.nextBoolean();
-            scanner.nextLine();
-            Task task = new Task(title, description, "", status);
-            tasks.add(task);
+
 
             String sql = "UPDATE TASKS SET TITLE = ?, DESCRIPTION = ?, DONE = ? WHERE TITLE = ?";
             stmt = connection.prepareStatement(sql);
             stmt.setString(1, title);
-            stmt.setString(2, description);
-            stmt.setBoolean(3, status);
-            stmt.setString(4, oldTitle);
+            stmt.setString(2, taskDesc);
+            stmt.setBoolean(3, Boolean.parseBoolean(TaskStatus));
+            stmt.setString(4, oldTaskTitle);
             stmt.executeUpdate();
 
         } finally {
@@ -285,43 +197,39 @@ class TaskManager {
             if (connection != null) {
                 connection.close();
             }
-            scanner.close();
         }
 
-        return tasks;
+
     }
 
-    //Mettre à jour une dated task
-    List<Task> updateDatedTask() throws SQLException {
+
+
+
+
+
+    public void addTask(String title, String description, String status, String firstName) throws SQLException {
         final H2Embeddedmode h2Embeddedmode = H2Embeddedmode.getInstance();
 
         Connection connection = null;
         PreparedStatement stmt = null;
-        Scanner scanner = new Scanner(System.in);
+
 
         try {
-            connection = h2Embeddedmode.getConnection();
-            System.out.println("Please enter the title of task to update: ");
-            String oldTitle = scanner.nextLine();
-            System.out.println("Enter de new title of task to update: ");
-            String title = scanner.nextLine();
-            System.out.println("Please enter the description of task to update: ");
-            String description = scanner.nextLine();
-            System.out.println("Please enter the done status of task to update: ");
-            boolean status = scanner.nextBoolean();
-            System.out.println("Please enter the Due date of task to update (YYYY-MM-DD): ");
-            String date = scanner.next();
-            scanner.nextLine();
+            connection = h2Embeddedmode.getConnection(); // Assuming h2Embeddedmode is a class that provides the connection
 
-            String sql = "UPDATE DATEDTASKS SET TITLE = ?, DESCRIPTION = ?, DONE = ?,DUEDATE = ? WHERE TITLE = ?";
+
+
+            String sql = "INSERT INTO TASKS (TITLE, DESCRIPTION, CREATOR, DONE) VALUES (?, ?, ?, ?)";
             stmt = connection.prepareStatement(sql);
             stmt.setString(1, title);
             stmt.setString(2, description);
-            stmt.setBoolean(3, status);
-            stmt.setString(4, date);
-            stmt.setString(5, oldTitle);
+            stmt.setObject(3, firstName);
+            stmt.setBoolean(4, Boolean.parseBoolean(status));
+
             stmt.executeUpdate();
 
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         } finally {
             // Close resources in finally block to ensure they are closed even if an exception occurs
             if (stmt != null) {
@@ -330,18 +238,13 @@ class TaskManager {
             if (connection != null) {
                 connection.close();
             }
-            scanner.close();
+
         }
 
-        return tasks;
-    }
-
-
-
-
-
 
     }
+    }
+
 
 
 
