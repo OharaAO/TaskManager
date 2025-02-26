@@ -1,18 +1,15 @@
-import java.time.LocalDate;
-import java.util.*;
-import me.xdrop.jrand.JRand;
-
 import javax.swing.*;
-import java.sql.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
 
 
 //
 // Classe principale pour exécuter le programme
-public class Main {
+public class Main  {
     public static void main(String[] args) throws Exception {
         // initialise la connexion à la base de donnée H2
         final H2Embeddedmode h2Embeddedmode = H2Embeddedmode.getInstance();
@@ -31,6 +28,18 @@ public class Main {
 
             }
         });
+            // crée un server
+        try (ServerSocket server = new ServerSocket(8080)) {
+            while (true) {
+                Socket client = server.accept(); // initialise le server
+                BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream())); // transformer le flux de donnée en texte
+
+
+
+            }
+        }
+
+
 
 
         // Ajouter une DatedTask

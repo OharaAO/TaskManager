@@ -1,21 +1,19 @@
-package Server;
-
 import org.h2.engine.User;
-import org.h2.util.Task;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Routeur {
 
+    TaskManager taskManager =  TaskManager.getInstance();
 
 
 
-
-    public void route(Socket client, Request request ) throws IOException {
+    public void route(Socket client, Request request ) throws IOException, SQLException {
         switch (request.getPath()) {
             case "/users":
                 handleUsersPath(client);
@@ -28,7 +26,7 @@ public class Routeur {
 
         }
     }
-    private void handleUsersPath(Socket client) throws IOException {
+    private void handleUsersPath(Socket client) throws IOException, SQLException {
         List<User> Users = new ArrayList<User>();
 
         StringBuilder stringBuilder = new StringBuilder();

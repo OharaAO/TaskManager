@@ -1,6 +1,3 @@
-package Server;
-
-
 public class Request {
     private String path;
     private String protocol;
