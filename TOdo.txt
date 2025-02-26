@@ -6,4 +6,6 @@ Finish the grphic interface using Swing :
     - link buttons to methos using "AdventListener"
     - create new pennel/ frames for each method called by pressing a button.
 
+- implement connexion to the local server 
+
 
