@@ -17,7 +17,7 @@ class Task {
 
 
     protected final String id; // Identifiant unique généré automatiquement
-    protected String title; // Titre de la tâche
+    protected static String title; // Titre de la tâche
     protected String description; // Description de la tâche
     protected boolean done; // Indicateur de complétion
     protected final String creator; // Référence à l'utilisateur créateur
@@ -50,7 +50,7 @@ class Task {
         return id;
     }
 
-    public String getTitle() {
+    public static String getTitle() {
         return title;
     }
 
