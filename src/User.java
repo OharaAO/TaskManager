@@ -3,17 +3,13 @@ import java.time.LocalDate;
 import java.util.*;
 
 class User {
-    // Champ statique pour garder le compteur
-    private static int instanceCounter;
 
-    protected final long id; // Identifiant unique généré automatiquement
+
+    protected final long id ; // Identifiant unique généré automatiquement
     protected String firstName;
     protected String lastName;// Prénom de l'utilisateur
 
-    // Bloc statique : initialise le compteur à 0
-    static {
-        instanceCounter = 0;
-    }
+
 
 
 
@@ -21,8 +17,9 @@ class User {
 
 
     public User(String firstName) {
-        this.id =  instanceCounter++;
+        this.id = getId();
         this.firstName = firstName;
+        this.lastName = firstName;
     }
 
 
@@ -49,5 +46,8 @@ class User {
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
+    }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 }

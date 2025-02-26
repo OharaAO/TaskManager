@@ -1,14 +1,14 @@
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-class TaskManager {
+class TaskManager  {
     private static TaskManager instance; // Instance unique de la classe
-    private List<Task> tasks = new ArrayList<>(); // Liste des tâches
-    private List<User> users = new ArrayList<>(); // Liste des utilisateurs
+
 
     // Constructeur privé pour empêcher l'instanciation directe
     private TaskManager() {}
@@ -28,6 +28,7 @@ class TaskManager {
     // Ajoute une tâche à la liste
     public List<Task> addTask() throws SQLException {
         final H2Embeddedmode h2Embeddedmode = H2Embeddedmode.getInstance();
+        List<Task> tasks = new ArrayList<>();
 
         Connection connection = null;
         PreparedStatement stmt = null;
@@ -109,8 +110,10 @@ class TaskManager {
     public void  addUser(String firstname) throws SQLException {
         final H2Embeddedmode h2Embeddedmode = H2Embeddedmode.getInstance();
 
+
         Connection connection = null;
         PreparedStatement stmt = null;
+
 
 
         try {
@@ -122,6 +125,7 @@ class TaskManager {
             stmt = connection.prepareStatement(sql);
             stmt.setString(1, firstname);
             stmt.executeUpdate();
+
 
         } finally {
             // Close resources in finally block to ensure they are closed even if an exception occurs
@@ -140,6 +144,7 @@ class TaskManager {
     //Supprimer un utilisateur
     public List<User> deleteUser() throws SQLException {
         final H2Embeddedmode h2Embeddedmode = H2Embeddedmode.getInstance();
+        List<User> users = new ArrayList<>();
 
         Connection connection = null;
         PreparedStatement stmt = null;
@@ -202,8 +207,37 @@ class TaskManager {
 
     }
 
+    public List<User> getUsers() throws SQLException {
+        final H2Embeddedmode h2Embeddedmode = H2Embeddedmode.getInstance();
+        List<User> users = new ArrayList<>();
+        Connection connection = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
 
+        try{
+            connection = h2Embeddedmode.getConnection();
+            String sql = "SELECT * FROM USERS";
+            stmt = connection.prepareStatement(sql);
+            rs = stmt.executeQuery();
 
+            while (rs.next()) {
+                User user = new User(rs.getString("USERNAME"));
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+        // Close resources in finally block to ensure they are closed even if an exception occurs
+        if (stmt != null) {
+            stmt.close();
+        }
+        if (connection != null) {
+            connection.close();
+        }
+
+    }
+        return users;
+    }
 
 
 
@@ -243,8 +277,9 @@ class TaskManager {
 
 
     }
-    }
 
+
+}
 
 
 
